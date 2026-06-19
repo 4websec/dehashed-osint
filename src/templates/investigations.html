@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% block content %}
+<h1>Investigations</h1>
+<form hx-post="/ui/investigations" hx-target="#inv-list" hx-swap="afterbegin">
+  <input name="name" placeholder="Investigation name" required>
+  <button type="submit">Create</button>
+</form>
+<ul id="inv-list">
+  {% for inv in investigations %}<li><a href="/ui/targets/{{ inv.id }}">{{ inv.name }}</a></li>{% endfor %}
+</ul>
+{% endblock %}

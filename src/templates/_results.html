@@ -1,0 +1,15 @@
+<table>
+  <tr><th>email</th><th>username</th><th>password</th><th>breach</th><th></th></tr>
+  {% for r in records %}
+  <tr>
+    <td>{{ r.email or "" }}</td><td>{{ r.username or "" }}</td>
+    <td>{{ r.password or "" }}</td><td>{{ r.database_name or "" }}</td>
+    <td>{% if r.email %}<button
+        hx-post="/ui/targets/{{ target_id }}/search"
+        hx-vals='{"field":"email","value":"{{ r.email }}"}'
+        hx-target="#results">pivot</button>{% endif %}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% if profile %}<p>Reused passwords: {{ profile.reused_passwords | length }} ·
+  Breaches: {{ profile.breach_sources | length }}</p>{% endif %}

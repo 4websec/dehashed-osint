@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% block content %}
+<h1>Pivot graph: {{ target.label }}</h1>
+<div id="cy" style="width:100%;height:600px;border:1px solid #ccc"></div>
+<script src="/static/cytoscape.min.js"></script>
+<script>
+  fetch("/v1/targets/{{ target.id }}/graph").then(r => r.json()).then(g => {
+    cytoscape({ container: document.getElementById("cy"),
+      elements: g.nodes.concat(g.edges),
+      style: [{ selector: "node", style: { label: "data(label)" } }] });
+  });
+</script>
+{% endblock %}
