@@ -6,7 +6,7 @@
     <td>{{ r.password or "" }}</td><td>{{ r.database_name or "" }}</td>
     <td>{% if r.email %}<button
         hx-post="/ui/targets/{{ target_id }}/search"
-        hx-vals='{"field":"email","value":"{{ r.email }}"}'
+        hx-vals="{{ {'field': 'email', 'value': r.email} | tojson }}"
         hx-target="#results">pivot</button>{% endif %}</td>
   </tr>
   {% endfor %}

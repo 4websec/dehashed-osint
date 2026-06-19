@@ -32,3 +32,14 @@ def test_authorize_then_home_renders(client):
     resp = client.get("/")
     assert resp.status_code == 200
     assert "Investigations" in resp.text
+
+
+def test_create_investigation_xss_name_is_escaped(client):
+    """Stored XSS regression: HTML in investigation name must be escaped."""
+    client.post("/authorize", data={"ack": "yes"})
+    xss_payload = "<script>alert(1)</script>"
+    resp = client.post("/ui/investigations", data={"name": xss_payload})
+    assert resp.status_code == 200
+    # Raw script tag must NOT appear — it must be HTML-entity-encoded.
+    assert "<script>" not in resp.text
+    assert "&lt;script&gt;" in resp.text

@@ -10,6 +10,7 @@ import httpx
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from markupsafe import escape
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import get_settings
@@ -72,8 +73,9 @@ async def create_investigation_ui(
     inv = await InvestigationRepository(session).create(name)
     await session.commit()
     # Return a minimal HTML fragment; HTMX swaps it into the list.
+    # inv.id is an int PK (safe); inv.name is user input — escape to prevent stored XSS.
     return HTMLResponse(
-        f'<li><a href="/ui/targets/{inv.id}">{inv.name}</a></li>'
+        f'<li><a href="/ui/targets/{inv.id}">{escape(inv.name)}</a></li>'
     )
 
 
