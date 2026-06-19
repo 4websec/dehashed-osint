@@ -25,7 +25,7 @@ def test_healthz(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("DEHASHED_API_KEY", "test-boot-key")
     monkeypatch.setenv(
         "DATABASE_URL",
-        "postgresql+asyncpg://osint:osint@localhost:5432/osint",
+        "postgresql+asyncpg://osint:osint@localhost:5432/osint_test",
     )
     monkeypatch.setenv(
         "ENCRYPTION_KEY",
