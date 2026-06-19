@@ -37,6 +37,12 @@ dev = [
     "types-reportlab (>=4.5.1.20260521,<5.0.0.0)"
 ]
 
+# This is a deployable application, not a distributable library; Poetry manages
+# dependencies only and does not try to install the project root as a package
+# (code lives under src/, run via `uvicorn src.main:create_app --factory`).
+[tool.poetry]
+package-mode = false
+
 [tool.black]
 line-length = 88
 
