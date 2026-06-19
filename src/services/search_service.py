@@ -77,7 +77,11 @@ class SearchService:
 
         cached = await self._repo.find_by_cache_key(key)
         if cached is not None:
-            # Identical query already persisted; return it without spending.
+            # Identical query already persisted; avoid re-spending credits.
+            # If the cached search was stored under a different target_id, copy
+            # its ResultRecord rows to the current target so that profile
+            # queries for target_id return the same data.
+            await self._repo.copy_records_for_target(cached.id, target_id)
             return cached
 
         response = await self._client.search(query, page=page, size=size)

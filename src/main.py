@@ -37,4 +37,9 @@ def create_app() -> FastAPI:
         """Liveness probe — no DB I/O, always fast."""
         return {"status": "ok"}
 
+    from src.api.v1 import investigations, searches
+
+    app.include_router(investigations.router)
+    app.include_router(searches.router)
+
     return app
