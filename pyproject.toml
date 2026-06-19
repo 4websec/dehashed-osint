@@ -42,6 +42,9 @@ line-length = 88
 [tool.ruff]
 line-length = 88
 target-version = "py311"
+# alembic/ contains auto-generated migration files and env.py boilerplate;
+# exclude them so generated code doesn't fail the lint gate.
+extend-exclude = ["alembic/"]
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "S"]
 # Tests legitimately use bare asserts (S101) and fake credentials as literals
@@ -53,6 +56,9 @@ select = ["E", "F", "I", "UP", "B", "S"]
 python_version = "3.11"
 strict = true
 files = ["src"]
+# alembic/ contains auto-generated boilerplate with untyped stubs; exclude it.
+# mypy already scopes to `files = ["src"]` so this is belt-and-suspenders.
+exclude = ["alembic/"]
 # pydantic plugin teaches mypy that BaseSettings fields load from env, so a
 # no-arg Settings() call is valid and not "missing required argument".
 plugins = ["pydantic.mypy"]
