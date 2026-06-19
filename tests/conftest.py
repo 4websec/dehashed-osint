@@ -13,6 +13,7 @@ from collections.abc import AsyncIterator
 
 import pytest
 import pytest_asyncio
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -22,6 +23,17 @@ from sqlalchemy.ext.asyncio import (
 from src.core.config import Settings
 from src.core.crypto import EncryptedString, FieldCipher
 from src.core.db import Base
+
+# All tables, child-first, for a deterministic TRUNCATE before each test.
+_ALL_TABLES = (
+    "audit_log",
+    "result_records",
+    "searches",
+    "selectors",
+    "targets",
+    "investigations",
+    "users",
+)
 
 
 @pytest.fixture(scope="session")
@@ -47,8 +59,42 @@ def configure_cipher(test_settings: Settings) -> None:
     )
 
 
+@pytest_asyncio.fixture(autouse=True)
+async def _clean_db(test_settings: Settings) -> AsyncIterator[None]:
+    """Reset the database to a clean, seeded state before EVERY test.
+
+    Integration tests drive the app through TestClient, whose routes use the
+    app's own sessions and COMMIT to Postgres. Those committed rows are not
+    rolled back by ``db_session`` and would otherwise leak across tests and
+    across runs (the docker volume persists), causing false cache-key hits in
+    SearchService tests. TRUNCATE ... RESTART IDENTITY CASCADE before each test
+    guarantees isolation regardless of test order; the seed user is re-inserted
+    to satisfy the NOT NULL owner_id FKs.
+    """
+    from src.models import SEED_USER_ID
+
+    engine = create_async_engine(test_settings.database_url, echo=False)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+        await conn.execute(
+            text(
+                "TRUNCATE "
+                + ", ".join(_ALL_TABLES)
+                + " RESTART IDENTITY CASCADE"
+            )
+        )
+        await conn.execute(
+            text("INSERT INTO users (id, label) VALUES (:id, 'local')"),
+            {"id": SEED_USER_ID},
+        )
+    await engine.dispose()
+    yield
+
+
 @pytest_asyncio.fixture
-async def db_session(test_settings: Settings) -> AsyncIterator[AsyncSession]:
+async def db_session(
+    test_settings: Settings, _clean_db: None
+) -> AsyncIterator[AsyncSession]:
     """Async DB session that rolls back after every test.
 
     Uses a proper AsyncSession backed by its own async engine.  Each test
