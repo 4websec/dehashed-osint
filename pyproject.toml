@@ -17,8 +17,8 @@ dependencies = [
     "pydantic-settings (>=2.14.1,<3.0.0)",
     "structlog (>=26.1.0,<27.0.0)",
     "cryptography (>=49.0.0,<50.0.0)",
-    "weasyprint (>=69.0,<70.0)",
-    "python-multipart (>=0.0.32,<0.0.33)"
+    "python-multipart (>=0.0.32,<0.0.33)",
+    "reportlab (>=5.0.0,<6.0.0)"
 ]
 
 
@@ -33,7 +33,8 @@ dev = [
     "respx (>=0.23.1,<0.24.0)",
     "black (>=26.5.1,<27.0.0)",
     "ruff (>=0.15.18,<0.16.0)",
-    "mypy (>=2.1.0,<3.0.0)"
+    "mypy (>=2.1.0,<3.0.0)",
+    "types-reportlab (>=4.5.1.20260521,<5.0.0.0)"
 ]
 
 [tool.black]
