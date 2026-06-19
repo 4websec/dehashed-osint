@@ -38,7 +38,8 @@ python -c "import base64, os; print(base64.b64encode(os.urandom(32)).decode())"
 # 3. Start Postgres
 docker compose up -d postgres
 
-# 4. Install Python dependencies
+# 4. Install Python dependencies (deps only — this is an app, not a
+#    packaged library, so Poetry runs in package-mode = false)
 poetry install
 
 # 5. Apply database migrations
