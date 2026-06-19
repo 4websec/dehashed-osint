@@ -1,3 +1,4 @@
+from collections.abc import MutableMapping
 from typing import Any
 
 import structlog
@@ -9,8 +10,8 @@ _SENSITIVE_KEYS = frozenset(
 
 
 def redact_sensitive(
-    _logger: Any, _method_name: str, event_dict: dict[str, Any]
-) -> dict[str, Any]:
+    _logger: Any, _method_name: str, event_dict: MutableMapping[str, Any]
+) -> MutableMapping[str, Any]:
     """structlog processor: redact PII/credential keys before output."""
     for key in _SENSITIVE_KEYS:
         if key in event_dict and event_dict[key] is not None:

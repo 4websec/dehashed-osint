@@ -53,6 +53,9 @@ select = ["E", "F", "I", "UP", "B", "S"]
 python_version = "3.11"
 strict = true
 files = ["src"]
+# pydantic plugin teaches mypy that BaseSettings fields load from env, so a
+# no-arg Settings() call is valid and not "missing required argument".
+plugins = ["pydantic.mypy"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
