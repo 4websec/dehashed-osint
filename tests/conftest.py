@@ -9,6 +9,7 @@ Task 5 will extend this file rather than recreate it.
 
 import base64
 import os
+from collections.abc import AsyncIterator
 
 import pytest
 import pytest_asyncio
@@ -47,7 +48,7 @@ def configure_cipher(test_settings: Settings) -> None:
 
 
 @pytest_asyncio.fixture
-async def db_session(test_settings: Settings) -> AsyncSession:  # type: ignore[misc]
+async def db_session(test_settings: Settings) -> AsyncIterator[AsyncSession]:
     """Async DB session that rolls back after every test.
 
     Uses a proper AsyncSession backed by its own async engine.  Each test
