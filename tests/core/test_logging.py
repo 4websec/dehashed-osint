@@ -16,6 +16,14 @@ def test_redacts_sensitive_keys():
         "status": "ok",
     }
     out = redact_sensitive(None, "info", dict(event))
-    for key in ("password", "hashed_password", "query", "email", "phone", "name", "address"):
+    for key in (
+        "password",
+        "hashed_password",
+        "query",
+        "email",
+        "phone",
+        "name",
+        "address",
+    ):
         assert out[key] == REDACTED
     assert out["status"] == "ok"  # non-sensitive untouched
