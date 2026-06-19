@@ -36,6 +36,38 @@ async def test_search_cache_lookup_and_records(db_session):
 
 
 @pytest.mark.asyncio
+async def test_records_for_target_deduplicates(db_session):
+    """Identical exposures from repeated searches collapse to one row."""
+    inv_repo = InvestigationRepository(db_session)
+    inv = await inv_repo.create("Dedup Op")
+    target = await inv_repo.add_target(inv.id, "jane")
+    s_repo = SearchRepository(db_session)
+    s1 = await s_repo.create(target.id, "email:x", "{}", "ckA", 1, 99, "1ms")
+    s2 = await s_repo.create(target.id, "email:x", "{}", "ckB", 1, 98, "1ms")
+    dup = RawEntry(email="a@b.com", username="jane", database_name="Canva")
+    other = RawEntry(email="a@b.com", username="jane2", database_name="Canva")
+    # Same exposure inserted under two searches + a distinct one.
+    await s_repo.add_records(s1.id, target.id, [dup])
+    await s_repo.add_records(s2.id, target.id, [dup, other])
+    records = await s_repo.records_for_target(target.id)
+    assert len(records) == 2  # dup collapsed, other kept
+    usernames = {r.username for r in records}
+    assert usernames == {"jane", "jane2"}
+
+
+@pytest.mark.asyncio
+async def test_list_audit_returns_newest_first(db_session):
+    s_repo = SearchRepository(db_session)
+    await s_repo.write_audit("search", "email:a", 1)
+    await s_repo.write_audit("search", "email:b", 2)
+    entries = await s_repo.list_audit()
+    assert len(entries) == 2
+    # Newest first (tie broken by id desc).
+    assert entries[0].query == "email:b"
+    assert entries[0].cost == 2
+
+
+@pytest.mark.asyncio
 async def test_raw_json_is_encrypted_at_rest(db_session):
     """raw_json must be stored encrypted; ORM must decrypt on read.
 
