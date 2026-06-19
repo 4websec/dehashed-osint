@@ -1,9 +1,11 @@
 <table>
-  <tr><th>email</th><th>username</th><th>password</th><th>breach</th><th></th></tr>
+  <tr><th>email</th><th>username</th><th>password</th><th>hashed_password</th><th>breach</th><th></th></tr>
   {% for r in records %}
   <tr>
     <td>{{ r.email or "" }}</td><td>{{ r.username or "" }}</td>
-    <td>{{ r.password or "" }}</td><td>{{ r.database_name or "" }}</td>
+    <td>{{ r.password or "" }}</td>
+    <td><code>{{ r.hashed_password or "" }}</code></td>
+    <td>{{ r.database_name or "" }}</td>
     <td>{% if r.email %}<button
         hx-post="/ui/targets/{{ target_id }}/search"
         hx-vals="{{ {'field': 'email', 'value': r.email} | tojson | forceescape }}"

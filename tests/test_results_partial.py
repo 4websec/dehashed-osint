@@ -24,7 +24,11 @@ def _render_results(email: str) -> str:
         autoescape=select_autoescape(["html"]),  # match Jinja2Templates default
     )
     rec = SimpleNamespace(
-        email=email, username="u", password=None, database_name="LeakA"
+        email=email,
+        username="u",
+        password=None,
+        hashed_password="$2a$08$abcdef",
+        database_name="LeakA",
     )
     return env.get_template("_results.html").render(
         records=[rec], target_id=1, profile=None
