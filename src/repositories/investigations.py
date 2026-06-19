@@ -36,6 +36,14 @@ class InvestigationRepository:
     async def get_target(self, target_id: int) -> Target | None:
         return await self._session.get(Target, target_id)
 
+    async def list_targets(self, investigation_id: int) -> list[Target]:
+        result = await self._session.execute(
+            select(Target)
+            .where(Target.investigation_id == investigation_id)
+            .order_by(Target.id)
+        )
+        return list(result.scalars().all())
+
     async def add_selector(
         self, target_id: int, field_type: str, value: str
     ) -> Selector:

@@ -7,7 +7,7 @@ Renders Jinja2 templates for investigations, target detail, search results
 from pathlib import Path
 
 import httpx
-from fastapi import APIRouter, Depends, Form, Request
+from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from markupsafe import escape
@@ -74,7 +74,47 @@ async def create_investigation_ui(
     # Return a minimal HTML fragment; HTMX swaps it into the list.
     # inv.id is an int PK (safe); inv.name is user input — escape to prevent stored XSS.
     return HTMLResponse(
-        f'<li><a href="/ui/targets/{inv.id}">{escape(inv.name)}</a></li>'
+        f'<li><a href="/ui/investigations/{inv.id}">{escape(inv.name)}</a></li>'
+    )
+
+
+@router.get("/ui/investigations/{investigation_id}", response_class=HTMLResponse)
+async def investigation_page(
+    request: Request,
+    investigation_id: int,
+    session: AsyncSession = Depends(get_session),
+) -> HTMLResponse:
+    """Render an investigation's detail page: its targets + an add-target form."""
+    repo = InvestigationRepository(session)
+    investigation = await repo.get(investigation_id)
+    if investigation is None:
+        raise HTTPException(status_code=404, detail="Investigation not found")
+    targets = await repo.list_targets(investigation_id)
+    return _templates.TemplateResponse(
+        request,
+        "investigation.html",
+        {"investigation": investigation, "targets": targets},
+    )
+
+
+@router.post(
+    "/ui/investigations/{investigation_id}/targets", response_class=HTMLResponse
+)
+async def create_target_ui(
+    request: Request,
+    investigation_id: int,
+    label: str = Form(...),
+    session: AsyncSession = Depends(get_session),
+) -> HTMLResponse:
+    """HTMX partial: create a target under an investigation, return an <li>."""
+    repo = InvestigationRepository(session)
+    if await repo.get(investigation_id) is None:
+        raise HTTPException(status_code=404, detail="Investigation not found")
+    target = await repo.add_target(investigation_id, label)
+    await session.commit()
+    # target.id is an int PK (safe); label is user input — escape to prevent XSS.
+    return HTMLResponse(
+        f'<li><a href="/ui/targets/{target.id}">{escape(target.label)}</a></li>'
     )
 
 
@@ -87,6 +127,8 @@ async def target_page(
     """Render the target detail page with existing result records."""
     repo = InvestigationRepository(session)
     target = await repo.get_target(target_id)
+    if target is None:
+        raise HTTPException(status_code=404, detail="Target not found")
     records = await SearchRepository(session).records_for_target(target_id)
     return _templates.TemplateResponse(
         request,
@@ -156,4 +198,6 @@ async def graph_page(
 ) -> HTMLResponse:
     """Render the Cytoscape.js pivot-graph page for *target_id*."""
     target = await InvestigationRepository(session).get_target(target_id)
+    if target is None:
+        raise HTTPException(status_code=404, detail="Target not found")
     return _templates.TemplateResponse(request, "graph.html", {"target": target})

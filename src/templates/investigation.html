@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% block content %}
+<p><a href="/">&larr; Investigations</a></p>
+<h1>Investigation: {{ investigation.name }}</h1>
+<form hx-post="/ui/investigations/{{ investigation.id }}/targets"
+      hx-target="#target-list" hx-swap="afterbegin">
+  <input name="label" placeholder="Target label (name, handle, org…)" required>
+  <button type="submit">Add target</button>
+</form>
+<ul id="target-list">
+  {% for t in targets %}<li><a href="/ui/targets/{{ t.id }}">{{ t.label }}</a></li>{% endfor %}
+</ul>
+{% endblock %}
