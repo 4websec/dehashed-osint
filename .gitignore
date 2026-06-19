@@ -13,3 +13,4 @@ build/
 # Playwright MCP artifacts
 .playwright-mcp/
 graph-target-1.png
+/*.png

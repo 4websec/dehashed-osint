@@ -1,12 +1,34 @@
 {% extends "base.html" %}{% block content %}
-<p><a href="/">&larr; Investigations</a></p>
-<h1>Investigation: {{ investigation.name }}</h1>
-<form hx-post="/ui/investigations/{{ investigation.id }}/targets"
-      hx-target="#target-list" hx-swap="afterbegin">
-  <input name="label" placeholder="Target label (name, handle, org…)" required>
-  <button type="submit">Add target</button>
-</form>
-<ul id="target-list">
-  {% for t in targets %}<li><a href="/ui/targets/{{ t.id }}">{{ t.label }}</a></li>{% endfor %}
-</ul>
+<div class="sheet">
+  <p class="crumb"><a href="/">Case Files</a><span class="sep">/</span>{{ investigation.name }}</p>
+
+  <div class="subject">
+    <span class="eyebrow eyebrow--amber">Case</span>
+    <h1 class="id" style="font-family:var(--cond);text-transform:none">{{ investigation.name }}</h1>
+  </div>
+
+  <span class="eyebrow eyebrow--amber">Add a subject</span>
+  <form class="requisition panel" style="margin-top:0.7rem"
+        hx-post="/ui/investigations/{{ investigation.id }}/targets"
+        hx-target="#target-list" hx-swap="afterbegin">
+    <div class="field field--grow">
+      <label class="eyebrow" for="t-label">Subject identifier</label>
+      <input id="t-label" name="label" placeholder="name, handle, email, org…" required>
+    </div>
+    <button class="btn" type="submit">Add subject</button>
+  </form>
+
+  <div class="section-head">
+    <span class="eyebrow">Subjects</span>
+    <span class="tally">{{ targets | length }}</span>
+  </div>
+  {% if targets %}
+  <ul id="target-list" class="index index--subjects">
+    {% for t in targets %}<li><a href="/ui/targets/{{ t.id }}">{{ t.label }}</a></li>{% endfor %}
+  </ul>
+  {% else %}
+  <ul id="target-list" class="index index--subjects"></ul>
+  <p class="empty">No subjects yet. Add one to start searching.</p>
+  {% endif %}
+</div>
 {% endblock %}

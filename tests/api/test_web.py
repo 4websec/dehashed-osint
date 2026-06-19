@@ -34,7 +34,7 @@ def test_authorize_then_home_renders(client):
     client.post("/authorize", data={"ack": "yes"})
     resp = client.get("/")
     assert resp.status_code == 200
-    assert "Investigations" in resp.text
+    assert "Case Files" in resp.text  # home renders the case-file dossier shell
 
 
 def test_create_investigation_xss_name_is_escaped(client):

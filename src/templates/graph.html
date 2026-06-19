@@ -1,12 +1,40 @@
 {% extends "base.html" %}{% block content %}
-<h1>Pivot graph: {{ target.label }}</h1>
-<div id="cy" style="width:100%;height:600px;border:1px solid #ccc"></div>
+<div class="sheet">
+  <p class="crumb">
+    <a href="/">Case Files</a><span class="sep">/</span>
+    <a href="/ui/targets/{{ target.id }}">Subject</a><span class="sep">/</span>Pivot graph
+  </p>
+  <div class="subject">
+    <span class="eyebrow eyebrow--amber">Pivot graph</span>
+    <h1 class="id">{{ target.label }}</h1>
+  </div>
+  <div id="cy"></div>
+</div>
 <script src="/static/cytoscape.min.js"></script>
 <script>
-  fetch("/v1/targets/" + {{ target.id | tojson }} + "/graph").then(r => r.json()).then(g => {
-    cytoscape({ container: document.getElementById("cy"),
-      elements: g.nodes.concat(g.edges),
-      style: [{ selector: "node", style: { label: "data(label)" } }] });
-  });
+  fetch("/v1/targets/" + {{ target.id | tojson }} + "/graph")
+    .then(r => r.json())
+    .then(g => {
+      cytoscape({
+        container: document.getElementById("cy"),
+        elements: g.nodes.concat(g.edges),
+        style: [
+          { selector: "node", style: {
+              "label": "data(label)", "color": "#e8edf2",
+              "font-family": "IBM Plex Mono, monospace", "font-size": "11px",
+              "background-color": "#222a35", "border-width": 1, "border-color": "#3a4554",
+              "width": 16, "height": 16, "text-margin-y": -7 } },
+          { selector: 'node[kind="target"]', style: {
+              "background-color": "#e0a33e", "border-color": "#e0a33e",
+              "width": 26, "height": 26, "color": "#e0a33e",
+              "font-family": "IBM Plex Sans Condensed, sans-serif",
+              "text-transform": "uppercase", "font-size": "12px" } },
+          { selector: "edge", style: {
+              "width": 1, "line-color": "#2a323f", "curve-style": "straight" } }
+        ],
+        layout: { name: "breadthfirst", roots: '[kind="target"]',
+                  padding: 28, spacingFactor: 1.35 }
+      });
+    });
 </script>
 {% endblock %}

@@ -1,10 +1,27 @@
 {% extends "base.html" %}{% block content %}
-<h1>Investigations</h1>
-<form hx-post="/ui/investigations" hx-target="#inv-list" hx-swap="afterbegin">
-  <input name="name" placeholder="Investigation name" required>
-  <button type="submit">Create</button>
-</form>
-<ul id="inv-list">
-  {% for inv in investigations %}<li><a href="/ui/investigations/{{ inv.id }}">{{ inv.name }}</a></li>{% endfor %}
-</ul>
+<div class="sheet">
+  <p class="crumb">Case Files</p>
+  <span class="eyebrow eyebrow--amber">Open a case</span>
+  <form class="requisition panel" style="margin-top:0.7rem"
+        hx-post="/ui/investigations" hx-target="#inv-list" hx-swap="afterbegin">
+    <div class="field field--grow">
+      <label class="eyebrow" for="inv-name">Case name</label>
+      <input id="inv-name" name="name" placeholder="e.g. Adrienne Balkum" required>
+    </div>
+    <button class="btn" type="submit">Open case</button>
+  </form>
+
+  <div class="section-head">
+    <span class="eyebrow">Cases on file</span>
+    <span class="tally">{{ investigations | length }}</span>
+  </div>
+  {% if investigations %}
+  <ul id="inv-list" class="index">
+    {% for inv in investigations %}<li><a href="/ui/investigations/{{ inv.id }}">{{ inv.name }}</a></li>{% endfor %}
+  </ul>
+  {% else %}
+  <ul id="inv-list" class="index"></ul>
+  <p class="empty">No cases on file. Open one to begin an investigation.</p>
+  {% endif %}
+</div>
 {% endblock %}

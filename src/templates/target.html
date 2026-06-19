@@ -1,12 +1,49 @@
 {% extends "base.html" %}{% block content %}
-<h1>Target: {{ target.label }}</h1>
-<form hx-post="/ui/targets/{{ target.id }}/search" hx-target="#results">
-  <select name="field">
-    {% for f in fields %}<option value="{{ f }}">{{ f }}</option>{% endfor %}
-  </select>
-  <input name="value" placeholder="value" required>
-  <button type="submit">Search</button>
-</form>
-<a href="/ui/targets/{{ target.id }}/graph">Pivot graph</a>
-<div id="results">{% include "_results.html" %}</div>
+<div class="sheet">
+  <p class="crumb">
+    <a href="/">Case Files</a><span class="sep">/</span>
+    <a href="/ui/investigations/{{ target.investigation_id }}">Case</a><span class="sep">/</span>Subject
+  </p>
+
+  <div class="subject">
+    <span class="eyebrow eyebrow--amber">Subject</span>
+    <h1 class="id">{{ target.label }}</h1>
+  </div>
+
+  <form class="requisition panel"
+        hx-post="/ui/targets/{{ target.id }}/search" hx-target="#results">
+    <div class="field">
+      <label class="eyebrow" for="q-field">Selector</label>
+      <select id="q-field" name="field">
+        {% for f in fields %}<option value="{{ f }}">{{ f }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field field--grow">
+      <label class="eyebrow" for="q-value">Query</label>
+      <input id="q-value" name="value" placeholder="value to search…" required>
+    </div>
+    <button class="btn" type="submit">Run search</button>
+  </form>
+
+  <div class="toolbar">
+    <span class="eyebrow">Report</span>
+    <a class="btn btn-ghost" href="/v1/targets/{{ target.id }}/report.pdf">⤓ PDF dossier</a>
+    <a class="btn btn-ghost" href="/v1/targets/{{ target.id }}/export.csv">⤓ CSV</a>
+    <a class="btn btn-ghost" href="/v1/targets/{{ target.id }}/export.json">⤓ JSON</a>
+    <span class="toolbar-sep" aria-hidden="true"></span>
+    <a class="btn btn-ghost" href="/ui/targets/{{ target.id }}/graph">◇ Pivot graph</a>
+  </div>
+
+  <details class="manual">
+    <summary>Field manual</summary>
+    <ol>
+      <li>Pick a <b>selector</b> (email, username, ip…) and enter a value, then <b>Run search</b>. Results accumulate on this subject and persist between visits.</li>
+      <li>Click a redaction bar to <b>reveal</b> a password or hash. Hash type is stamped beside it.</li>
+      <li>Hit <b>Pivot</b> on any row to search that record's email and widen the net.</li>
+      <li>Export the dossier as <b>PDF / CSV / JSON</b>, or open the <b>pivot graph</b> to see the relationship map.</li>
+    </ol>
+  </details>
+
+  <div id="results">{% include "_results.html" %}</div>
+</div>
 {% endblock %}

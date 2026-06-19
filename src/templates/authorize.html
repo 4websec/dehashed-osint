@@ -1,8 +1,11 @@
 {% extends "base.html" %}{% block content %}
-<h1>Authorization Required</h1>
-<p>Confirm you are authorized to search for leaked data on these targets.
-   All searches are logged.</p>
-<form method="post" action="/authorize">
-  <button name="ack" value="yes" type="submit">I am authorized — proceed</button>
-</form>
+<section class="gate">
+  <span class="seal">Restricted · Authorized Use Only</span>
+  <h1>Access control</h1>
+  <p>This console queries real breach data on the subjects you name. Confirm you
+     are authorized to investigate them — every search is written to the audit log.</p>
+  <form method="post" action="/authorize" style="margin-top:1.6rem">
+    <button class="btn" name="ack" value="yes" type="submit">I am authorized — proceed</button>
+  </form>
+</section>
 {% endblock %}
