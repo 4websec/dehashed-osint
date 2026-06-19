@@ -1,6 +1,7 @@
 import asyncio
 
 import httpx
+from pydantic import ValidationError
 
 from src.core.exceptions import (
     DehashedAPIError,
@@ -57,7 +58,15 @@ class DehashedClient:
                 f"{self._base_url}/search", json=body, headers=headers
             )
             if resp.status_code == 200:
-                return SearchResponse.model_validate(resp.json())
+                try:
+                    return SearchResponse.model_validate(resp.json())
+                except ValidationError as exc:
+                    # Unexpected/unparseable 200 body — surface as a domain error
+                    # so callers degrade gracefully instead of raising a raw
+                    # ValidationError that escapes exception mapping (→ HTTP 500).
+                    raise DehashedAPIError(
+                        "DeHashed returned an unparseable response body"
+                    ) from exc
             if resp.status_code in (401, 403):
                 raise DehashedAuthError("DeHashed authentication failed")
             if resp.status_code == 429:
