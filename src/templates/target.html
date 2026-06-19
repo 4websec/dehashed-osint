@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% block content %}
+<h1>Target: {{ target.label }}</h1>
+<form hx-post="/ui/targets/{{ target.id }}/search" hx-target="#results">
+  <select name="field">
+    {% for f in fields %}<option value="{{ f }}">{{ f }}</option>{% endfor %}
+  </select>
+  <input name="value" placeholder="value" required>
+  <button type="submit">Search</button>
+</form>
+<a href="/ui/targets/{{ target.id }}/graph">Pivot graph</a>
+<div id="results">{% include "_results.html" %}</div>
+{% endblock %}

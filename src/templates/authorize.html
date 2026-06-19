@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% block content %}
+<h1>Authorization Required</h1>
+<p>Confirm you are authorized to search for leaked data on these targets.
+   All searches are logged.</p>
+<form method="post" action="/authorize">
+  <button name="ack" value="yes" type="submit">I am authorized — proceed</button>
+</form>
+{% endblock %}
