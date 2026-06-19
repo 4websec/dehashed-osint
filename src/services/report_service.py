@@ -92,9 +92,7 @@ def profile_to_pdf(
     flowables: list[Any] = []
 
     # ── Title ──────────────────────────────────────────────────────────────
-    title_text = (
-        f"<b>Investigation: {investigation_name} — Target: {target_label}</b>"
-    )
+    title_text = f"<b>Investigation: {investigation_name} — Target: {target_label}</b>"
     flowables.append(Paragraph(title_text, styles["Title"]))
     flowables.append(Spacer(1, 0.25 * inch))
 
@@ -105,9 +103,7 @@ def profile_to_pdf(
 
     # ── Usernames ──────────────────────────────────────────────────────────
     username_list = ", ".join(profile.usernames) if profile.usernames else "—"
-    flowables.append(
-        Paragraph(f"<b>Usernames:</b> {username_list}", styles["Normal"])
-    )
+    flowables.append(Paragraph(f"<b>Usernames:</b> {username_list}", styles["Normal"]))
     flowables.append(Spacer(1, 0.1 * inch))
 
     # ── Reused passwords ───────────────────────────────────────────────────

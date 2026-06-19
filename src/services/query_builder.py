@@ -32,7 +32,5 @@ def normalize_query(query: str) -> str:
 
 def cache_key(query: str, params: dict[str, object]) -> str:
     """Return a 64-char sha256 hex digest stable for equal inputs."""
-    payload = json.dumps(
-        {"q": normalize_query(query), "p": params}, sort_keys=True
-    )
+    payload = json.dumps({"q": normalize_query(query), "p": params}, sort_keys=True)
     return hashlib.sha256(payload.encode()).hexdigest()

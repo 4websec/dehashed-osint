@@ -70,9 +70,7 @@ class SearchRepository:
         )
         return list(result.scalars().all())
 
-    async def copy_records_for_target(
-        self, search_id: int, target_id: int
-    ) -> None:
+    async def copy_records_for_target(self, search_id: int, target_id: int) -> None:
         """Ensure ResultRecord rows for *search_id* exist under *target_id*.
 
         On a cache hit the original records may belong to a different target;

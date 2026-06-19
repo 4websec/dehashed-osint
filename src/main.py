@@ -47,10 +47,11 @@ def create_app() -> FastAPI:
         """Liveness probe — no DB I/O, always fast."""
         return {"status": "ok"}
 
-    from src.api.v1 import investigations, searches
+    from src.api.v1 import exports, investigations, searches
 
     app.include_router(investigations.router)
     app.include_router(searches.router)
+    app.include_router(exports.router)
 
     # Mount vendored static assets (htmx, cytoscape, app.css).
     # The directory must exist before mounting; StaticFiles raises on startup

@@ -10,9 +10,12 @@ from src.main import create_app
 @pytest.fixture
 def client(monkeypatch):
     monkeypatch.setenv("DEHASHED_API_KEY", "k")
-    monkeypatch.setenv("DATABASE_URL", "postgresql+asyncpg://osint:osint@localhost:5432/osint")
+    monkeypatch.setenv(
+        "DATABASE_URL", "postgresql+asyncpg://osint:osint@localhost:5432/osint"
+    )
     monkeypatch.setenv("ENCRYPTION_KEY", base64.b64encode(os.urandom(32)).decode())
     from src.core.config import get_settings
+
     get_settings.cache_clear()
     # Use as context manager so Starlette's TestClient keeps a single event
     # loop alive across all requests — required on Windows with asyncpg where

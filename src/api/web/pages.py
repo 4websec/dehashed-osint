@@ -26,9 +26,7 @@ router = APIRouter()
 
 # Resolve templates directory relative to this file's location so the path is
 # stable regardless of the working directory at runtime.
-_TEMPLATES_DIR = str(
-    Path(__file__).resolve().parent.parent.parent / "templates"
-)
+_TEMPLATES_DIR = str(Path(__file__).resolve().parent.parent.parent / "templates")
 _templates = Jinja2Templates(directory=_TEMPLATES_DIR)
 
 
@@ -150,6 +148,4 @@ async def graph_page(
 ) -> HTMLResponse:
     """Render the Cytoscape.js pivot-graph page for *target_id*."""
     target = await InvestigationRepository(session).get_target(target_id)
-    return _templates.TemplateResponse(
-        request, "graph.html", {"target": target}
-    )
+    return _templates.TemplateResponse(request, "graph.html", {"target": target})

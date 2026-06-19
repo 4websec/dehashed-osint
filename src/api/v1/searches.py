@@ -115,8 +115,6 @@ async def get_graph(
         for value in values:
             node_id = f"{field}:{value}"
             nodes.append({"data": {"id": node_id, "label": value, "kind": field}})
-            edges.append(
-                {"data": {"source": f"target:{target_id}", "target": node_id}}
-            )
+            edges.append({"data": {"source": f"target:{target_id}", "target": node_id}})
 
     return {"nodes": nodes, "edges": edges}

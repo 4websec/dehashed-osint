@@ -46,9 +46,7 @@ class _Client(Protocol):
 class SearchService:
     """Runs DeHashed searches with caching, credit-guard, persistence, audit."""
 
-    def __init__(
-        self, repo: SearchRepository, client: _Client, threshold: int
-    ) -> None:
+    def __init__(self, repo: SearchRepository, client: _Client, threshold: int) -> None:
         self._repo = repo
         self._client = client
         # Minimum acceptable post-call balance before refusing further spend.
