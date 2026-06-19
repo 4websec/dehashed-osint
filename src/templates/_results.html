@@ -46,6 +46,7 @@
   <span class="stat {% if profile.reused_passwords %}stat--alert{% endif %}">Reused <b>{{ profile.reused_passwords | length }}</b></span>
   <span class="stat">Breaches <b>{{ profile.breach_sources | length }}</b></span>
   <span class="stat">Hashes <b>{{ profile.hash_types | length }}</b></span>
+  {% if balance is not none %}<span class="stat">Credits <b>{{ balance }}</b></span>{% endif %}
 </div>
 {% endif %}
 

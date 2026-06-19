@@ -1,10 +1,14 @@
 import base64
 import os
 
+import httpx
 import pytest
+import respx
 from fastapi.testclient import TestClient
 
 from src.main import create_app
+
+_DEHASHED = "https://api.dehashed.com/v2/search"
 
 
 @pytest.fixture
@@ -91,3 +95,30 @@ def test_missing_investigation_returns_404(client):
     client.post("/authorize", data={"ack": "yes"})
     resp = client.get("/ui/investigations/99999")
     assert resp.status_code == 404
+
+
+@respx.mock
+def test_search_shows_balance_and_writes_audit(client):
+    """A search surfaces remaining credits and is recorded in the audit log."""
+    client.post("/authorize", data={"ack": "yes"})
+    respx.post(_DEHASHED).mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "balance": 437,
+                "total": 1,
+                "entries": [{"email": "a@b.com", "database_name": "Canva"}],
+            },
+        )
+    )
+    client.post("/ui/investigations", data={"name": "Op"})
+    client.post("/ui/investigations/1/targets", data={"label": "jane"})
+    resp = client.post(
+        "/ui/targets/1/search", data={"field": "email", "value": "a@b.com"}
+    )
+    assert resp.status_code == 200
+    assert "Credits" in resp.text and "437" in resp.text  # balance surfaced
+
+    audit = client.get("/ui/audit")
+    assert audit.status_code == 200
+    assert "email:" in audit.text and "a@b.com" in audit.text  # search logged

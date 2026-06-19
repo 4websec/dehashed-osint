@@ -141,6 +141,7 @@ async def target_page(
             "fields": sorted(ALLOWED_FIELDS),
             "target_id": target_id,
             "profile": None,
+            "balance": None,
         },
     )
 
@@ -171,7 +172,7 @@ async def search_ui(
                 client,
                 settings.credit_guard_threshold,
             )
-            await svc.run_search(target_id, query)
+            search = await svc.run_search(target_id, query)
     except (InsufficientCreditsError, DehashedError) as exc:
         # Return a friendly HTML fragment instead of a 500; HTMX swaps it in.
         return HTMLResponse(
@@ -188,7 +189,12 @@ async def search_ui(
     return _templates.TemplateResponse(
         request,
         "_results.html",
-        {"records": records, "target_id": target_id, "profile": profile},
+        {
+            "records": records,
+            "target_id": target_id,
+            "profile": profile,
+            "balance": search.balance_after,
+        },
     )
 
 
@@ -203,3 +209,13 @@ async def graph_page(
     if target is None:
         raise HTTPException(status_code=404, detail="Target not found")
     return _templates.TemplateResponse(request, "graph.html", {"target": target})
+
+
+@router.get("/ui/audit", response_class=HTMLResponse)
+async def audit_page(
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+) -> HTMLResponse:
+    """Render the append-only audit log: every search run, newest first."""
+    entries = await SearchRepository(session).list_audit()
+    return _templates.TemplateResponse(request, "audit.html", {"entries": entries})

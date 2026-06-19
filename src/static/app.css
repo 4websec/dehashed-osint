@@ -103,6 +103,16 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
   box-shadow: 0 0 0 3px rgba(224,163,62,0.18);
 }
 
+.mast-nav { display: flex; align-items: center; gap: 1.4rem; }
+.mast-nav a {
+  font-family: var(--cond);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.mast-nav a:hover { color: var(--amber); text-decoration: none; }
+
 /* --- sheet / layout ------------------------------------------------------ */
 .sheet {
   max-width: 1080px;

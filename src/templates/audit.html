@@ -1,0 +1,33 @@
+{% extends "base.html" %}{% block content %}
+<div class="sheet">
+  <p class="crumb"><a href="/">Case Files</a><span class="sep">/</span>Audit log</p>
+  <div class="subject">
+    <span class="eyebrow eyebrow--amber">Audit log</span>
+    <h1 class="id" style="font-family:var(--cond);text-transform:none">Every search, on the record</h1>
+  </div>
+
+  <div class="section-head">
+    <span class="eyebrow">Entries</span>
+    <span class="tally">{{ entries | length }}</span>
+  </div>
+  {% if entries %}
+  <table class="ledger">
+    <thead>
+      <tr><th>Timestamp</th><th>Action</th><th>Query</th><th>Cost</th></tr>
+    </thead>
+    <tbody>
+    {% for e in entries %}
+      <tr>
+        <td>{{ e.ts.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+        <td><span class="tag">{{ e.action }}</span></td>
+        <td>{{ e.query or "" }}</td>
+        <td>{{ e.cost }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No searches logged yet.</p>
+  {% endif %}
+</div>
+{% endblock %}
