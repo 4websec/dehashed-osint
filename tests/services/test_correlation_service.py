@@ -27,7 +27,8 @@ async def test_build_profile_dedups_and_maps(db_session):
     s_repo = SearchRepository(db_session)
     s = await s_repo.create(target.id, "q", "{}", "ck", 1, 99, "1ms")
     await s_repo.add_records(
-        s.id, target.id,
+        s.id,
+        target.id,
         [
             RawEntry(email="a@b.com", password="reuse", database_name="LeakA"),
             RawEntry(email="a@b.com", password="reuse", database_name="LeakB"),

@@ -77,11 +77,7 @@ async def _clean_db(test_settings: Settings) -> AsyncIterator[None]:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
         await conn.execute(
-            text(
-                "TRUNCATE "
-                + ", ".join(_ALL_TABLES)
-                + " RESTART IDENTITY CASCADE"
-            )
+            text("TRUNCATE " + ", ".join(_ALL_TABLES) + " RESTART IDENTITY CASCADE")
         )
         await conn.execute(
             text("INSERT INTO users (id, label) VALUES (:id, 'local')"),
