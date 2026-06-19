@@ -2,6 +2,7 @@ import base64
 import os
 
 import pytest
+from cryptography.exceptions import InvalidTag
 
 from src.core.crypto import FieldCipher
 
@@ -24,5 +25,5 @@ def test_decrypt_rejects_tampered_token():
     cipher = FieldCipher(KEY)
     token = cipher.encrypt("secret")
     tampered = token[:-2] + ("AA" if not token.endswith("AA") else "BB")
-    with pytest.raises(Exception):  # AES-GCM auth tag failure
+    with pytest.raises(InvalidTag):
         cipher.decrypt(tampered)

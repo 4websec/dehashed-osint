@@ -42,11 +42,13 @@ class EncryptedString(TypeDecorator[str]):
     def process_bind_param(self, value: Any, dialect: Any) -> str | None:
         if value is None:
             return None
-        assert self._cipher is not None, "EncryptedString.configure() not called"
+        if self._cipher is None:
+            raise RuntimeError("EncryptedString.configure() not called before DB I/O")
         return self._cipher.encrypt(str(value))
 
     def process_result_value(self, value: Any, dialect: Any) -> str | None:
         if value is None:
             return None
-        assert self._cipher is not None, "EncryptedString.configure() not called"
+        if self._cipher is None:
+            raise RuntimeError("EncryptedString.configure() not called before DB I/O")
         return self._cipher.decrypt(str(value))
