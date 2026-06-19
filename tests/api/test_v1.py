@@ -30,6 +30,25 @@ def client(monkeypatch):
 
 
 @respx.mock
+def test_rate_limit_upstream_yields_503(client):
+    """DeHashed 429 after all retries must surface as 503 from the v1 route."""
+    # Return 429 for every attempt so all retries are exhausted and the client
+    # raises DehashedRateLimitError, which the route maps to 503.
+    respx.post(f"{BASE}/search").mock(
+        return_value=httpx.Response(429, json={"error": "rate limited"})
+    )
+    inv = client.post("/v1/investigations", json={"name": "RateOp"}).json()
+    target = client.post(
+        f"/v1/investigations/{inv['id']}/targets", json={"label": "victim"}
+    ).json()
+    run = client.post(
+        f"/v1/targets/{target['id']}/searches",
+        json={"field": "email", "value": "x@x.com"},
+    )
+    assert run.status_code == 503
+
+
+@respx.mock
 def test_full_investigation_search_flow(client):
     respx.post(f"{BASE}/search").mock(
         return_value=httpx.Response(

@@ -12,9 +12,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import get_settings
 from src.core.db import get_session
-from src.core.exceptions import DehashedAuthError, InsufficientCreditsError
+from src.core.exceptions import (
+    DehashedAPIError,
+    DehashedAuthError,
+    DehashedRateLimitError,
+    InsufficientCreditsError,
+)
 from src.repositories.external.dehashed import DehashedClient
 from src.repositories.searches import SearchRepository
+from src.schemas.domain import TargetProfile
 from src.services.correlation_service import CorrelationService
 from src.services.query_builder import build_query
 from src.services.search_service import SearchService
@@ -39,6 +45,8 @@ async def run_search(
     - ValueError (disallowed field) → 422
     - InsufficientCreditsError → 402
     - DehashedAuthError → 502
+    - DehashedRateLimitError → 503
+    - DehashedAPIError → 502
     """
     settings = get_settings()
 
@@ -65,6 +73,10 @@ async def run_search(
             raise HTTPException(status_code=402, detail=str(exc)) from exc
         except DehashedAuthError as exc:
             raise HTTPException(status_code=502, detail=str(exc)) from exc
+        except DehashedRateLimitError as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
+        except DehashedAPIError as exc:
+            raise HTTPException(status_code=502, detail=str(exc)) from exc
 
     # Commit only after the async client has closed cleanly.
     await session.commit()
@@ -79,12 +91,9 @@ async def run_search(
 async def get_profile(
     target_id: int,
     session: AsyncSession = Depends(get_session),
-) -> dict[str, object]:
+) -> TargetProfile:
     """Return the deduplicated TargetProfile for *target_id*."""
-    profile = await CorrelationService(SearchRepository(session)).build_profile(
-        target_id
-    )
-    return profile.model_dump()
+    return await CorrelationService(SearchRepository(session)).build_profile(target_id)
 
 
 @router.get("/targets/{target_id}/graph")

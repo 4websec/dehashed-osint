@@ -8,6 +8,7 @@ import csv
 import io
 import json
 from typing import Any
+from xml.sax.saxutils import escape as xml_escape
 
 from reportlab.lib.pagesizes import LETTER
 from reportlab.lib.styles import getSampleStyleSheet
@@ -92,17 +93,29 @@ def profile_to_pdf(
     flowables: list[Any] = []
 
     # ── Title ──────────────────────────────────────────────────────────────
-    title_text = f"<b>Investigation: {investigation_name} — Target: {target_label}</b>"
+    # xml_escape prevents ReportLab from misinterpreting markup characters in
+    # untrusted investigation names and target labels (e.g. "<script>" in a
+    # breach-derived username would corrupt the PDF paragraph XML parser).
+    title_text = (
+        f"<b>Investigation: {xml_escape(investigation_name)}"
+        f" — Target: {xml_escape(target_label)}</b>"
+    )
     flowables.append(Paragraph(title_text, styles["Title"]))
     flowables.append(Spacer(1, 0.25 * inch))
 
     # ── Emails ─────────────────────────────────────────────────────────────
-    email_list = ", ".join(profile.emails) if profile.emails else "—"
+    email_list = (
+        ", ".join(xml_escape(e) for e in profile.emails) if profile.emails else "—"
+    )
     flowables.append(Paragraph(f"<b>Emails:</b> {email_list}", styles["Normal"]))
     flowables.append(Spacer(1, 0.1 * inch))
 
     # ── Usernames ──────────────────────────────────────────────────────────
-    username_list = ", ".join(profile.usernames) if profile.usernames else "—"
+    username_list = (
+        ", ".join(xml_escape(u) for u in profile.usernames)
+        if profile.usernames
+        else "—"
+    )
     flowables.append(Paragraph(f"<b>Usernames:</b> {username_list}", styles["Normal"]))
     flowables.append(Spacer(1, 0.1 * inch))
 

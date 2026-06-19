@@ -21,7 +21,9 @@ def build_query(field: str, value: str) -> str:
     """Build a single field:value clause. Whitelists field, quotes value."""
     if field not in ALLOWED_FIELDS:
         raise ValueError(f"Disallowed search field: {field!r}")
-    escaped = value.replace('"', '\\"')
+    # Escape backslash first so existing backslashes are not double-escaped
+    # when the quote escape runs afterward.
+    escaped = value.replace("\\", "\\\\").replace('"', '\\"')
     return f'{field}:"{escaped}"'
 
 

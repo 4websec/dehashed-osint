@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import get_settings
 from src.core.db import get_session
+from src.core.exceptions import DehashedError, InsufficientCreditsError
 from src.repositories.external.dehashed import DehashedClient
 from src.repositories.investigations import InvestigationRepository
 from src.repositories.searches import SearchRepository
@@ -114,18 +115,25 @@ async def search_ui(
     settings = get_settings()
     query = build_query(field, value)
 
-    async with httpx.AsyncClient(timeout=30) as hc:
-        client = DehashedClient(
-            settings.dehashed_api_key.get_secret_value(),
-            settings.dehashed_base_url,
-            hc,
+    try:
+        async with httpx.AsyncClient(timeout=30) as hc:
+            client = DehashedClient(
+                settings.dehashed_api_key.get_secret_value(),
+                settings.dehashed_base_url,
+                hc,
+            )
+            svc = SearchService(
+                SearchRepository(session),
+                client,
+                settings.credit_guard_threshold,
+            )
+            await svc.run_search(target_id, query)
+    except (InsufficientCreditsError, DehashedError) as exc:
+        # Return a friendly HTML fragment instead of a 500; HTMX swaps it in.
+        return HTMLResponse(
+            f'<p class="error">Search failed: {escape(str(exc))}</p>',
+            status_code=200,
         )
-        svc = SearchService(
-            SearchRepository(session),
-            client,
-            settings.credit_guard_threshold,
-        )
-        await svc.run_search(target_id, query)
 
     await session.commit()
 

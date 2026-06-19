@@ -78,7 +78,7 @@ class ResultRecord(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     search_id: Mapped[int] = mapped_column(ForeignKey("searches.id"))
     target_id: Mapped[int] = mapped_column(ForeignKey("targets.id"))
-    raw_json: Mapped[str] = mapped_column(Text)
+    raw_json: Mapped[str] = mapped_column(EncryptedString)
     email: Mapped[str | None] = mapped_column(String(320), nullable=True)
     username: Mapped[str | None] = mapped_column(String(200), nullable=True)
     # Sensitive fields encrypted at rest via AES-GCM.
