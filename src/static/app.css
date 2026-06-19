@@ -1,1 +1,5 @@
 body{font-family:sans-serif;margin:2rem;} table{border-collapse:collapse;} td,th{border:1px solid #ccc;padding:4px;}
+code{font-size:.85em;word-break:break-all;}
+.badge{display:inline-block;background:#334155;color:#fff;border-radius:3px;
+  padding:0 6px;font-size:.75em;vertical-align:middle;margin-left:4px;}
+.error{color:#b91c1c;}

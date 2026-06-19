@@ -15,6 +15,8 @@ from types import SimpleNamespace
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
+from src.services.correlation_service import identify_hash_type
+
 _TEMPLATES = Path(__file__).resolve().parents[1] / "src" / "templates"
 
 
@@ -23,6 +25,7 @@ def _render_results(email: str) -> str:
         loader=FileSystemLoader(str(_TEMPLATES)),
         autoescape=select_autoescape(["html"]),  # match Jinja2Templates default
     )
+    env.filters["hash_type"] = identify_hash_type  # match pages.py registration
     rec = SimpleNamespace(
         email=email,
         username="u",

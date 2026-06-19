@@ -9,3 +9,7 @@ build/
 .mypy_cache/
 .ruff_cache/
 .pytest_cache/
+
+# Playwright MCP artifacts
+.playwright-mcp/
+graph-target-1.png

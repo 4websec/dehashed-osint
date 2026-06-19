@@ -4,7 +4,8 @@
   <tr>
     <td>{{ r.email or "" }}</td><td>{{ r.username or "" }}</td>
     <td>{{ r.password or "" }}</td>
-    <td><code>{{ r.hashed_password or "" }}</code></td>
+    <td>{% if r.hashed_password %}<code>{{ r.hashed_password }}</code>
+      <span class="badge">{{ r.hashed_password | hash_type }}</span>{% endif %}</td>
     <td>{{ r.database_name or "" }}</td>
     <td>{% if r.email %}<button
         hx-post="/ui/targets/{{ target_id }}/search"

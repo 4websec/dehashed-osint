@@ -11,7 +11,11 @@ from src.services.correlation_service import CorrelationService, identify_hash_t
     [
         ("5f4dcc3b5aa765d61d8327deb882cf99", "MD5"),
         ("aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d", "SHA-1"),
+        ("a" * 64, "SHA-256"),
         ("$2b$12$" + "a" * 53, "bcrypt"),
+        # DeHashed-annotated forms: "<hash>[:salt]||<Algorithm>"
+        ("$2a$08$" + "a" * 53 + ":None||Blowfish(OpenBSD)", "bcrypt"),
+        ("5f4dcc3b5aa765d61d8327deb882cf99:salt||MD5", "MD5"),
         ("notahash", "unknown"),
     ],
 )

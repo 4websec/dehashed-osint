@@ -19,7 +19,7 @@ from src.core.exceptions import DehashedError, InsufficientCreditsError
 from src.repositories.external.dehashed import DehashedClient
 from src.repositories.investigations import InvestigationRepository
 from src.repositories.searches import SearchRepository
-from src.services.correlation_service import CorrelationService
+from src.services.correlation_service import CorrelationService, identify_hash_type
 from src.services.query_builder import ALLOWED_FIELDS
 from src.services.search_service import SearchService
 
@@ -29,6 +29,8 @@ router = APIRouter()
 # stable regardless of the working directory at runtime.
 _TEMPLATES_DIR = str(Path(__file__).resolve().parent.parent.parent / "templates")
 _templates = Jinja2Templates(directory=_TEMPLATES_DIR)
+# Expose hash-type identification to templates (badge next to hashed_password).
+_templates.env.filters["hash_type"] = identify_hash_type
 
 
 @router.get("/authorize", response_class=HTMLResponse)

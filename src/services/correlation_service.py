@@ -13,17 +13,20 @@ _BCRYPT = re.compile(r"^\$2[aby]\$\d{2}\$.{53}$")
 def identify_hash_type(value: str) -> str:
     """Return the hash algorithm name for *value*, or 'unknown'.
 
-    bcrypt is checked first because its prefix is unambiguous; the hex-length
-    checks below would otherwise mis-classify a bcrypt string that happens to
-    be 32/40/64 chars long in edge cases.
+    DeHashed annotates hashed passwords as ``<hash>[:salt]||<Algorithm>`` (e.g.
+    ``$2a$08$...:None||Blowfish(OpenBSD)``), so we reduce the value to its bare
+    hash before matching — otherwise real DeHashed values never classify.
+    bcrypt is checked first because its ``$2x$`` prefix is unambiguous; the
+    hex-length checks below would otherwise mis-classify edge cases.
     """
-    if _BCRYPT.match(value):
+    core = value.split("||", 1)[0].split(":", 1)[0].strip()
+    if _BCRYPT.match(core):
         return "bcrypt"
-    if _MD5.match(value):
+    if _MD5.match(core):
         return "MD5"
-    if _SHA1.match(value):
+    if _SHA1.match(core):
         return "SHA-1"
-    if _SHA256.match(value):
+    if _SHA256.match(core):
         return "SHA-256"
     return "unknown"
 
