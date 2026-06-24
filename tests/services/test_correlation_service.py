@@ -42,4 +42,6 @@ async def test_build_profile_dedups_and_maps(db_session):
     profile = await CorrelationService(s_repo).build_profile(target.id)
     assert profile.emails == ["a@b.com"]  # deduped
     assert "reuse" in profile.reused_passwords  # appears in 2 breaches
+    # 2 distinct breaches; "other" (single source) is excluded
+    assert profile.reuse_counts == {"reuse": 2}
     assert profile.breach_sources == {"LeakA": 2, "LeakB": 1}

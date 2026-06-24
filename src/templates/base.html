@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
   <title>DeHashed · Case Console</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +21,7 @@
     <nav class="mast-nav">
       <a href="/">Cases</a>
       <a href="/ui/audit">Audit log</a>
-      <span class="status"><span class="dot" aria-hidden="true"></span> Restricted</span>
+      <span class="status"><span class="dot" aria-hidden="true"></span> <span class="label">Restricted</span></span>
     </nav>
   </header>
   <main>{% block content %}{% endblock %}</main>

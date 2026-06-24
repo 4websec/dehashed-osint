@@ -15,16 +15,20 @@
     <div class="field">
       <label class="eyebrow" for="q-field">Selector</label>
       <select id="q-field" name="field">
-        {% for f in fields %}<option value="{{ f }}">{{ f }}</option>{% endfor %}
+        {% for f in fields %}<option value="{{ f }}"{% if f == "email" %} selected{% endif %}>{{ f }}</option>{% endfor %}
       </select>
     </div>
     <div class="field field--grow">
       <label class="eyebrow" for="q-value">Query</label>
       <input id="q-value" name="value" placeholder="value to search…" required>
     </div>
-    <button class="btn" type="submit">Run search</button>
+    <button class="btn" type="submit" hx-disabled-elt="this">
+      <span class="spin" aria-hidden="true"></span>
+      <span class="btn-label" data-busy="Searching…">Run search</span>
+    </button>
   </form>
 
+  {% if records %}
   <div class="toolbar">
     <span class="eyebrow">Report</span>
     <a class="btn btn-ghost" href="/v1/targets/{{ target.id }}/report.pdf">⤓ PDF dossier</a>
@@ -33,6 +37,7 @@
     <span class="toolbar-sep" aria-hidden="true"></span>
     <a class="btn btn-ghost" href="/ui/targets/{{ target.id }}/graph">◇ Pivot graph</a>
   </div>
+  {% endif %}
 
   <details class="manual">
     <summary>Field manual</summary>

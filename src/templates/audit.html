@@ -18,10 +18,10 @@
     <tbody>
     {% for e in entries %}
       <tr>
-        <td>{{ e.ts.strftime("%Y-%m-%d %H:%M:%S") }}</td>
-        <td><span class="tag">{{ e.action }}</span></td>
-        <td>{{ e.query or "" }}</td>
-        <td>{{ e.cost }}</td>
+        <td data-label="Timestamp">{{ e.ts.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+        <td data-label="Action"><span class="tag">{{ e.action }}</span></td>
+        <td data-label="Query">{{ e.query or "" }}</td>
+        <td data-label="Cost">{{ e.cost }}</td>
       </tr>
     {% endfor %}
     </tbody>

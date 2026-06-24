@@ -61,6 +61,9 @@ class CorrelationService:
             if r.password and r.database_name:
                 pw_breaches.setdefault(r.password, set()).add(r.database_name)
         reused = [pw for pw, srcs in pw_breaches.items() if len(srcs) > 1]
+        reuse_counts = {
+            pw: len(srcs) for pw, srcs in pw_breaches.items() if len(srcs) > 1
+        }
 
         breach_sources = dict(
             Counter(r.database_name for r in records if r.database_name)
@@ -78,6 +81,7 @@ class CorrelationService:
             passwords=passwords,
             ip_addresses=ips,
             reused_passwords=reused,
+            reuse_counts=reuse_counts,
             breach_sources=breach_sources,
             hash_types=hash_types,
         )
