@@ -25,12 +25,28 @@ from src.services.search_service import SearchService
 
 router = APIRouter()
 
+
+def reuse_color(password: str) -> str:
+    """Deterministic on-brand hue for a reused password's group chip.
+
+    A stable hash of the password maps to a hue; saturation/lightness are fixed
+    so chips read as muted accents, not rainbow. Used only to disambiguate when
+    multiple distinct reused passwords are present in one target.
+    """
+    h = 0
+    for ch in password:
+        h = (h * 31 + ord(ch)) & 0xFFFFFFFF
+    hue = h % 360
+    return f"hsl({hue}, 55%, 55%)"
+
+
 # Resolve templates directory relative to this file's location so the path is
 # stable regardless of the working directory at runtime.
 _TEMPLATES_DIR = str(Path(__file__).resolve().parent.parent.parent / "templates")
 _templates = Jinja2Templates(directory=_TEMPLATES_DIR)
 # Expose hash-type identification to templates (badge next to hashed_password).
 _templates.env.filters["hash_type"] = identify_hash_type
+_templates.env.filters["reuse_color"] = reuse_color
 
 
 @router.get("/authorize", response_class=HTMLResponse)

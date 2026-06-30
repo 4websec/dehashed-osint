@@ -160,7 +160,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
   font-family: var(--mono);
   font-size: clamp(1.4rem, 3.2vw, 2.1rem);
   font-weight: 500;
-  word-break: break-all;
+  overflow-wrap: anywhere;
   line-height: 1.15;
   margin: 0.25rem 0 0;
 }
@@ -488,5 +488,101 @@ h1 { font-weight: 700; }
   .masthead { padding: 0.75rem 1rem; }
   .brand .sub { display: none; }
   .sheet { padding: 1.6rem 1rem 3rem; }
-  .ledger { display: block; overflow-x: auto; white-space: nowrap; }
+
+  /* keep the masthead a single row on narrow screens */
+  .mast-nav { gap: 0.9rem; }
+  .status .label { display: none; }
+
+  /* shrink the subject so long emails fit instead of breaking mid-token */
+  .subject .id { font-size: 1.05rem; }
+
+  /* ledger -> stacked, self-labeled cards */
+  .ledger, .ledger thead, .ledger tbody, .ledger tr, .ledger td { display: block; }
+  .ledger thead { display: none; }
+  .ledger tr {
+    border: 1px solid var(--hairline);
+    border-radius: var(--r);
+    margin-bottom: 0.7rem;
+    padding: 0.2rem 0.6rem;
+  }
+  .ledger tbody td {
+    border-bottom: 1px dashed var(--hairline);
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0.2rem;
+    white-space: normal;
+    text-align: right;
+  }
+  .ledger tbody tr td:last-child { border-bottom: 0; }
+  .ledger tbody td::before {
+    content: attr(data-label);
+    font-family: var(--cond);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.62rem;
+    color: var(--muted);
+    text-align: left;
+    flex: none;
+  }
+  .ledger tbody td[data-label=""]::before { content: ""; }
 }
+
+/* --- search pending state ------------------------------------------------ */
+.btn .spin { display: none; }
+.btn[disabled] { opacity: 0.7; cursor: progress; }
+.btn.htmx-request .spin {
+  display: inline-block;
+  width: 0.7em; height: 0.7em;
+  margin-right: 0.45em;
+  border: 2px solid rgba(17,21,28,0.35);
+  border-top-color: var(--carbon);
+  border-radius: 50%;
+  vertical-align: -1px;
+  animation: btnspin 0.6s linear infinite;
+}
+/* swap the label "Run search" -> "Searching…" while the request is in flight */
+.btn.htmx-request .btn-label { font-size: 0; }
+.btn.htmx-request .btn-label::after {
+  content: attr(data-busy);
+  font-size: 0.82rem;
+}
+@keyframes btnspin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .btn.htmx-request .spin { animation: none; } }
+
+/* --- password reuse markers ---------------------------------------------- */
+.pwcell { display: inline-flex; align-items: center; gap: 0.4rem; }
+.reuse-chip {
+  width: 9px; height: 9px;
+  border-radius: 2px;
+  flex: none;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.3) inset;
+}
+.reuse-stamp {
+  font-family: var(--cond);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--exposure);
+  border: 1px solid var(--exposure);
+  border-radius: 2px;
+  padding: 0.02rem 0.35rem;
+}
+.ledger tr.reused td { background: rgba(229,72,77,0.05); }
+
+/* --- copy-on-reveal control ---------------------------------------------- */
+.copy {
+  font-family: var(--cond);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.6rem;
+  color: var(--amber);
+  border: 1px solid var(--amber-dim);
+  background: rgba(224,163,62,0.07);
+  border-radius: 2px;
+  padding: 0.02rem 0.35rem;
+  margin-left: 0.4rem;
+  cursor: pointer;
+}
+.copy:hover { background: rgba(224,163,62,0.18); }

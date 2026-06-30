@@ -10,25 +10,31 @@
   </thead>
   <tbody>
   {% for r in records %}
-    <tr>
-      <td>{{ r.email or "" }}</td>
-      <td>{% if r.username %}{{ r.username }}{% else %}<span class="nil">—</span>{% endif %}</td>
-      <td>
+    {% set n = profile.reuse_counts.get(r.password) if profile and r.password else None %}
+    <tr{% if n %} class="reused"{% endif %}>
+      <td data-label="Email">{{ r.email or "" }}</td>
+      <td data-label="Username">{% if r.username %}{{ r.username }}{% else %}<span class="nil">—</span>{% endif %}</td>
+      <td data-label="Password">
         {% if r.password %}
-        <button class="redact" type="button" aria-pressed="false" aria-label="Reveal redacted value">
-          <span class="bar">redacted</span><span class="v v--cred">{{ r.password }}</span>
-        </button>
+        <span class="pwcell">
+          {% if n %}<span class="reuse-chip" style="background:{{ r.password | reuse_color }}" title="reused in {{ n }} breaches"></span>{% endif %}
+          <button class="redact" type="button" aria-pressed="false" aria-label="Reveal redacted value">
+            <span class="bar">redacted</span><span class="v v--cred">{{ r.password }}</span>
+          </button>
+          <button class="copy" type="button" aria-label="Copy value" data-copy="{{ r.password }}" hidden>copy</button>
+          {% if n %}<span class="reuse-stamp" title="reused in {{ n }} breaches">↻ ×{{ n }}</span>{% endif %}
+        </span>
         {% else %}<span class="nil">—</span>{% endif %}
       </td>
-      <td>
+      <td data-label="Hash">
         {% if r.hashed_password %}
         <button class="redact" type="button" aria-pressed="false" aria-label="Reveal redacted value">
           <span class="bar">redacted</span><span class="v">{{ r.hashed_password }}</span>
-        </button><span class="stamp">{{ r.hashed_password | hash_type }}</span>
+        </button><button class="copy" type="button" aria-label="Copy value" data-copy="{{ r.hashed_password }}" hidden>copy</button><span class="stamp">{{ r.hashed_password | hash_type }}</span>
         {% else %}<span class="nil">—</span>{% endif %}
       </td>
-      <td>{% if r.database_name %}<span class="tag">{{ r.database_name }}</span>{% else %}<span class="nil">—</span>{% endif %}</td>
-      <td>{% if r.email %}<button class="btn btn-ghost"
+      <td data-label="Source">{% if r.database_name %}<span class="tag">{{ r.database_name }}</span>{% else %}<span class="nil">—</span>{% endif %}</td>
+      <td data-label="">{% if r.email %}<button class="btn btn-ghost"
           hx-post="/ui/targets/{{ target_id }}/search"
           hx-vals="{{ {'field': 'email', 'value': r.email} | tojson | forceescape }}"
           hx-target="#results">⤢ Pivot</button>{% endif %}</td>
@@ -43,7 +49,7 @@
     <span class="eyebrow">Sources</span>
     {% for src, n in profile.breach_sources.items() %}<span class="tag">{{ src }} · {{ n }}</span>{% endfor %}
   </div>
-  <span class="stat {% if profile.reused_passwords %}stat--alert{% endif %}">Reused <b>{{ profile.reused_passwords | length }}</b></span>
+  <span class="stat {% if profile.reuse_counts %}stat--alert{% endif %}">Reused <b>{{ profile.reuse_counts | length }}</b>{% if profile.reuse_counts %} · across <b>{{ profile.reuse_counts.values() | max }}</b> breaches{% endif %}</span>
   <span class="stat">Breaches <b>{{ profile.breach_sources | length }}</b></span>
   <span class="stat">Hashes <b>{{ profile.hash_types | length }}</b></span>
   {% if balance is not none %}<span class="stat">Credits <b>{{ balance }}</b></span>{% endif %}
